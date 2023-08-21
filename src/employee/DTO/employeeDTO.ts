@@ -1,14 +1,25 @@
 // employee.dto.ts
 
-import { IsNotEmpty, IsEmail, IsPhoneNumber, IsNumberString, isString, IsString, Matches } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEmail,
+  IsNumberString,
+  IsString,
+  Matches,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 
 export class EmployeeDTO {
   id: number;
 
   @IsNotEmpty()
+  @MinLength(3)
+  @MaxLength(25)
   first_name: string;
 
   @IsNotEmpty()
+  @MinLength(3)
   last_name: string;
 
   @IsNotEmpty()
@@ -17,10 +28,13 @@ export class EmployeeDTO {
   @IsEmail()
   email: string;
 
- @IsString()
-@Matches(/^\d{10}$/)
+  @IsString()
+  @Matches(/^\d{10}$/)
   phone_no: string;
 
-  @IsNumberString() 
+  @IsNumberString()
   salary: string;
+  @IsString()
+  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/)
+  password: string;
 }

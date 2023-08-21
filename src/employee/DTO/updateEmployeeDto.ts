@@ -30,4 +30,8 @@ export class updateEmployeeDTO {
   @IsOptional()
   @IsNumberString()
   salary: string;
+  @IsOptional()
+  @IsString()
+  @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/)
+  password: string;
 }

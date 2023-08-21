@@ -6,42 +6,20 @@ import {
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import { updateEmployeeDTO } from './DTO/updateEmployeeDto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  async createEmployee(employeeData: any): Promise<any> {
-    console.log('create method call.........');
-
-    const sql =
-      'INSERT INTO employee (first_name, last_name, address, email, phone_no, salary) VALUES (?, ?, ?, ?, ?, ?)';
-    const values = [
-      employeeData.first_name,
-      employeeData.last_name,
-      employeeData.address,
-      employeeData.email,
-      employeeData.phone_no,
-      employeeData.salary,
-    ];
-
-    try {
-      const result = await this.databaseService.query(sql, values);
-      return result;
-    } catch (error) {
-     
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException('This email address is already in use.');
-      }
-      throw error; 
-    }
-  }
+ 
 
   async findAll(): Promise<any[]> {
     console.log('findall method call');
 
     const sql = 'SELECT * FROM employee';
     const results = await this.databaseService.query(sql);
+
     return results;
   }
   async findById(id: number): Promise<any> {
@@ -54,17 +32,24 @@ export class EmployeeService {
     if (!results) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-
+    // results.address = JSON.parse(results.address)
     return results;
   }
   async updateById(
     id: number,
     updateEmployeeDTO: updateEmployeeDTO,
   ): Promise<any> {
-    const { first_name, last_name, address, email, phone_no, salary } =
-      updateEmployeeDTO;
-console.log("update method call>>>>>>>>>>>>>>");
-
+    const {
+      first_name,
+      last_name,
+      address,
+      email,
+      phone_no,
+      salary,
+      password,
+    } = updateEmployeeDTO;
+    console.log('update method call>>>>>>>>>>>>>>');
+    const existingEmployee = await this.findById(id);
     const updateFields = [];
     const values = [];
 
@@ -92,6 +77,13 @@ console.log("update method call>>>>>>>>>>>>>>");
       updateFields.push('salary = ?');
       values.push(salary);
     }
+    if (password !== undefined) {
+      const hashedPassword = await bcrypt.hash(updateEmployeeDTO.password, 10);
+      console.log(hashedPassword);
+
+      updateFields.push('password = ?');
+      values.push(hashedPassword);
+    }
 
     if (updateFields.length === 0) {
       throw new BadRequestException('No valid fields to update');
@@ -113,7 +105,21 @@ console.log("update method call>>>>>>>>>>>>>>");
       if (updatedEmployee.affectedRows === 0) {
         throw new NotFoundException('Employee not found');
       }
-      return updatedEmployee;
+
+      const response = {
+        message: 'Employee updated successfully',
+        user: {
+          id: id,
+          first_name: first_name || existingEmployee.first_name,
+          last_name: last_name || existingEmployee.last_name,
+          address: address || existingEmployee.address,
+          email: email || existingEmployee.email,
+          phone_no: phone_no || existingEmployee.phone_no,
+          salary: salary || existingEmployee.salary,
+          password: password || existingEmployee.password,
+        },
+      };
+      return response;
     } catch (error) {
       throw new Error(
         'An error occurred while updating employee: ' + error.message,
