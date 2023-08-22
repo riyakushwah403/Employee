@@ -1,5 +1,5 @@
-// employee.dto.ts
 
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsEmail,
@@ -8,8 +8,10 @@ import {
   Matches,
   MinLength,
   MaxLength,
+  IsNumber,
+  ValidateNested,
 } from 'class-validator';
-
+import { AddressDto } from './addressDto';
 export class EmployeeDTO {
   id: number;
 
@@ -22,8 +24,9 @@ export class EmployeeDTO {
   @MinLength(3)
   last_name: string;
 
-  @IsNotEmpty()
-  address: string;
+  // @ValidateNested() 
+  // @Type(() => AddressDto)
+  // address: AddressDto;
 
   @IsEmail()
   email: string;
@@ -34,7 +37,10 @@ export class EmployeeDTO {
 
   @IsNumberString()
   salary: string;
+
   @IsString()
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/)
   password: string;
 }
+
+

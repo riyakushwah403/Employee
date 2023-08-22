@@ -1,11 +1,17 @@
+import { Type } from 'class-transformer';
 import {
   IsEmail,
   IsNumberString,
   IsString,
   Matches,
   IsOptional,
-} from 'class-validator';
+  IsNotEmpty,
+  MinLength,
+  IsNumber,
+  ValidateNested,
 
+} from 'class-validator';
+import { AddressDto, updateAddressDTO } from './addressDto';
 export class updateEmployeeDTO {
   id: number;
 
@@ -15,8 +21,10 @@ export class updateEmployeeDTO {
   @IsOptional()
   last_name: string;
 
-  @IsOptional()
-  address: string;
+ 
+  @ValidateNested() 
+  @Type(() => updateAddressDTO)
+  addressData: updateAddressDTO;
 
   @IsEmail()
   @IsOptional()
@@ -30,8 +38,11 @@ export class updateEmployeeDTO {
   @IsOptional()
   @IsNumberString()
   salary: string;
+
+  
   @IsOptional()
   @IsString()
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()]).{8,}$/)
   password: string;
 }
+
