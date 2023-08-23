@@ -5,11 +5,15 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
+import { clientDto } from './clientDto';
+import { Type } from 'class-transformer';
 
 export class ProjectDto {
   @IsString()
   @MinLength(4)
+  @IsNotEmpty()
   name: string;
 
   @IsString()
@@ -25,10 +29,14 @@ export class ProjectDto {
   end_date: Date;
 
   @IsString()
+  @IsOptional()
   status: string;
 
-  @IsString()
-  client: string;
+  
+  @ValidateNested() 
+  @Type(() => clientDto)
+  client: clientDto;
+
 }
 
 

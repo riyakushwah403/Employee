@@ -14,33 +14,7 @@ import { AddressDto } from './DTO/addressDto';
 export class EmployeeService {
   constructor(private readonly databaseService: DatabaseService) {}
 
-  // async createEmployee(employeeData: any): Promise<any> {
-  //   console.log('create method call.........');
-  //   const hashedPassword = await bcrypt.hash(employeeData.password, 10);
-  //   console.log(hashedPassword);
-
-  //   const sql =
-  //     'INSERT INTO employee (first_name, last_name, address, email, phone_no, salary) VALUES (?, ?, ?, ?, ?, ?)';
-  //   const values = [
-  //     employeeData.first_name,
-  //     employeeData.last_name,
-  //     employeeData.address,
-  //     employeeData.email,
-  //     employeeData.phone_no,
-  //     employeeData.salary,
-  //     hashedPassword,
-  //   ];
-
-  //   try {
-  //     const result = await this.databaseService.query(sql, values);
-  //     return result;
-  //   } catch (error) {
-  //     if (error.code === 'ER_DUP_ENTRY') {
-  //       throw new ConflictException('This email address is already in use.');
-  //     }
-  //     throw error;
-  //   }
-  // }
+ 
 
   async findAll(): Promise<any[]> {
     console.log('findAll method call');
@@ -161,30 +135,50 @@ export class EmployeeService {
   }
 
  
-  async deleteById(id: number): Promise<string> {
-    const deleteAddressQuery = 'DELETE FROM address WHERE employee_id = ?';
-    const deleteEmployeeQuery = 'DELETE FROM employee WHERE id = ?';
-    const updateProjectQuery = 'UPDATE project SET employee_ids =  JSON_REMOVE(employee_ids, JSON_UNQUOTE(JSON_SEARCH(employee_ids, "one", ?))) WHERE JSON_SEARCH(employee_ids, "one", ?) IS NOT NULL';
+  // async deleteById(id: number): Promise<string> {
+  //   const deleteAddressQuery = 'DELETE FROM address WHERE employee_id = ?';
+  //   const deleteEmployeeQuery = 'DELETE FROM employee WHERE id = ?';
+  //   const updateProjectQuery = 'UPDATE project SET employee_ids =  JSON_REMOVE(employee_ids, JSON_UNQUOTE(JSON_SEARCH(employee_ids, "one", ?))) WHERE JSON_SEARCH(employee_ids, "one", ?) IS NOT NULL';
 
+  
+  //   const values = [id];
+  
+  //   try {
+  //     await this.databaseService.query(deleteAddressQuery, values);
+  
+  //     await this.databaseService.query(updateProjectQuery, [id, id]);
+  
+  //     const result = await this.databaseService.query(deleteEmployeeQuery, values);
+  
+  //     if (result.affectedRows === 0) {
+  //       throw new NotFoundException(`User with id ${id} not found`);
+  //     }
+  
+  //     return 'Employee and related data deleted successfully';
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // }
+  async deleteById(id: number): Promise<string> {
+    const updateEmployeeQuery = 'UPDATE employee SET IsDelete = true WHERE id = ?';
+    const updateAddressQuery = 'UPDATE address SET IsDelete = true WHERE employee_id = ?';
+    const updateProjectQuery = 'UPDATE project SET employee_ids =  JSON_REMOVE(employee_ids, JSON_UNQUOTE(JSON_SEARCH(employee_ids, "one", ?))) WHERE JSON_SEARCH(employee_ids, "one", ?) IS NOT NULL';
   
     const values = [id];
   
     try {
-      await this.databaseService.query(deleteAddressQuery, values);
+      await this.databaseService.query(updateEmployeeQuery, values);
+  
+      await this.databaseService.query(updateAddressQuery, values);
   
       await this.databaseService.query(updateProjectQuery, [id, id]);
   
-      const result = await this.databaseService.query(deleteEmployeeQuery, values);
-  
-      if (result.affectedRows === 0) {
-        throw new NotFoundException(`User with id ${id} not found`);
-      }
-  
-      return 'Employee and related data deleted successfully';
+      return 'Employee and related data soft deleted successfully';
     } catch (error) {
       throw error;
     }
   }
+  
   
 
   async getAddressByEmployeeId(employeeId: number): Promise<AddressDto> {

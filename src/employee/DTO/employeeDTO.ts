@@ -24,9 +24,9 @@ export class EmployeeDTO {
   @MinLength(3)
   last_name: string;
 
-  // @ValidateNested() 
-  // @Type(() => AddressDto)
-  // address: AddressDto;
+  @ValidateNested() 
+  @Type(() => AddressDto)
+  address: AddressDto;
 
   @IsEmail()
   email: string;

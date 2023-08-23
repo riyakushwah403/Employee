@@ -7,24 +7,53 @@ export class ProjectController {
   constructor(private readonly projectService: ProjectService) {}
 
 
+  // @Post('add')
+  // async createProject(@Body() projectData: ProjectDto): Promise<CustomResponse> {
+  //   const customResponse = await this.projectService.createProjects(projectData);
+  //   return customResponse;
+  // }
+
   @Post('add')
-  async createProject(@Body() projectData: ProjectDto): Promise<CustomResponse> {
+  async createProject(
+    @Body() projectData: ProjectDto,
+  ): Promise<CustomResponse> {
     const customResponse = await this.projectService.createProjects(projectData);
     return customResponse;
   }
-  @Post('assign/:employeeId')
+  // @Post('assign/:employeeId')
+  // async assignProjectToEmployee(
+  //   @Param('employeeId') employeeId: number,
+  //   @Query('projectId') projectId: number,
+  // ): Promise<CustomResponse> {
+  //   const customResponse = await this.projectService.assignProjectToEmployee(employeeId, projectId);
+  //   return customResponse;
+  // }
+  @Post('assign')
   async assignProjectToEmployee(
-    @Param('employeeId') employeeId: number,
-    @Query('projectId') projectId: number,
+    @Body() assignmentData: { employeeId: number, projectId: number }
   ): Promise<CustomResponse> {
-    const customResponse = await this.projectService.assignProjectToEmployee(employeeId, projectId);
-    return customResponse;
+    const { employeeId, projectId } = assignmentData;
+  console.log(assignmentData.employeeId);
+  console.log(assignmentData.projectId);
+  
+  
+    try {
+      const customResponse = await this.projectService.assignProjectToEmployee(employeeId, projectId);
+      return customResponse;
+    } catch (error) {
+      console.error('Error:', error);
+      throw error;
+    }
   }
+  
+  
+
 
   @Get('')
   async getAllProjects(): Promise<ProjectDto[]> {
     return this.projectService.getAllProjects();
   }
+
   @Get(':employeeId')
   async getProjectsByEmployeeId(@Param('employeeId') employeeId: number): Promise<ProjectDto[]> {
     return this.projectService.getProjectsByEmployeeId(employeeId);
@@ -37,6 +66,7 @@ export class ProjectController {
   ): Promise<CustomResponse> {
     return this.projectService.updateProject(projectId, updatedData);
   }
+
   @Delete(':id')
   async deleteProject(@Param('id') projectId: number): Promise<CustomResponse> {
     await this.projectService.deleteProject(projectId);

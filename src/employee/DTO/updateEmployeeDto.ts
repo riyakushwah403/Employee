@@ -22,9 +22,9 @@ export class updateEmployeeDTO {
   last_name: string;
 
  
-  @ValidateNested() 
-  @Type(() => updateAddressDTO)
-  addressData: updateAddressDTO;
+  // @ValidateNested() 
+  // @Type(() => updateAddressDTO)
+  // addressData: updateAddressDTO;
 
   @IsEmail()
   @IsOptional()
